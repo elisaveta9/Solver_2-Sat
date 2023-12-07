@@ -12,8 +12,8 @@ public class Pair {
 
     private String literal1;
     private boolean sign1;
-    private String literal2;
-    private boolean sign2;
+    private String literal2 = "";
+    private boolean sign2 = true;
     private int type;
 
     public Pair(int type) {
@@ -31,13 +31,11 @@ public class Pair {
         }
         literal1 = disjunction[0];
         if (disjunction.length == 2) {
-            if (Pattern.matches("^[!-]\\w+$", disjunction[1])) {
-                sign2 = false;
-                literal2 = disjunction[1].substring(1);
-            } else {
-                sign2 = true;
-                literal2 = disjunction[1];
+            boolean sign2 = !Pattern.matches("^[!-]\\w+$", disjunction[1]);
+            if (!sign2) {
+                disjunction[1] = disjunction[1].substring(1);
             }
+            addLiteral2(disjunction[1], sign2);
         }
     }
 
@@ -58,7 +56,7 @@ public class Pair {
     }
 
     public boolean isDoable() {
-        return !(literal1.equals(literal2) && sign1 == sign2);
+        return !(literal1.equals(literal2) && sign1 != sign2);
     }
 
     public boolean isDoable(boolean value1) {
@@ -146,7 +144,7 @@ public class Pair {
         this.sign1 = sign1;
     }
 
-    public void addLiteral2(String literal2, boolean sign2) {
+    private void addLiteral2(String literal2, boolean sign2) {
         if (!(literal1.equals(literal2) && sign1 == sign2)) {
             this.literal2 = literal2;
             this.sign2 = sign2;
@@ -177,5 +175,35 @@ public class Pair {
     @Override
     public int hashCode() {
         return Objects.hash(literal1, sign1, literal2, sign2);
+    }
+
+    @Override
+    public String toString() {
+        String firstPart = (sign1) ? literal1 : "!" + literal1, secondPart;
+        if (!hasLiteral2()) {
+            secondPart = (sign2) ? "1" : "0";
+        } else {
+            secondPart = (sign2) ? literal2 : "!" + literal2;
+        }
+        switch (type) {
+            case CONJUNCTION -> {
+                return "(" + firstPart + "*" + secondPart + ")";
+            }
+            case DISJUNCTION -> {
+                return "(" + firstPart + "+" + secondPart + ")";
+            }
+            case IMPLICATION -> {
+                return "(" + firstPart + "->" + secondPart + ")";
+            }
+            case EQUIVALENCE -> {
+                return "(" + firstPart + "<->" + secondPart + ")";
+            }
+            case EXCLUSIVE_DISJUNCTION -> {
+                return "(" + firstPart + "XOR" + secondPart + ")";
+            }
+            default -> {
+                throw new IllegalArgumentException("Unknown type " + type);
+            }
+        }
     }
 }
