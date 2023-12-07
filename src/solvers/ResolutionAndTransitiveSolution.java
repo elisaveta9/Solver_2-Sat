@@ -183,8 +183,13 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
     }
 
     private String canUnion(Pair pair1, Pair pair2) {
+        String defaultAnswer = "";
         if (!pair1.hasLiteral2() || !pair2.hasLiteral2()) {
-            return "";
+            return defaultAnswer;
+        }
+        if (!((pair1.getLiteral1().equals(pair2.getLiteral1()) && pair1.getLiteral2().equals(pair2.getLiteral2())) ||
+                (pair1.getLiteral1().equals(pair2.getLiteral2()) && pair1.getLiteral2().equals(pair2.getLiteral1())))) {
+            return defaultAnswer;
         }
         if ((pair1.getLiteral1().equals(pair2.getLiteral1()) && pair1.isSign1() != pair2.isSign1()) ||
                 (pair1.getLiteral1().equals(pair2.getLiteral2()) && pair1.isSign1() != pair2.isSign2())) {
@@ -193,8 +198,7 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
                 (pair1.getLiteral2().equals(pair2.getLiteral2()) && pair1.isSign2() != pair2.isSign2())) {
             return pair1.getLiteral2();
         }
-        return "";
-
+        return defaultAnswer;
     }
 
     @Override
