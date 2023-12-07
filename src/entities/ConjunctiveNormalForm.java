@@ -3,17 +3,16 @@ package entities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.regex.Pattern;
 
 public class ConjunctiveNormalForm {
 
-    private final HashMap<String, HashSet<Integer>> literals = new HashMap<>();
-    private final HashMap<Integer, Disjunction> disjunctionMap = new HashMap<>();
+    private final HashMap<String, ArrayList<Integer>> literals = new HashMap<>();
+    private final HashMap<Integer, Pair> disjunctionMap = new HashMap<>();
     private Integer idDisjunction = 0;
 
     public ConjunctiveNormalForm(String str) {
-        String regex = "^(([!-]?\\w+)|(\\([!-]?\\w+(\\|\\||\\\\/)[!-]?\\w+\\))(/\\\\|\\*|&&)?)+$";
+        String regex = "^(([!-]?\\w+)|(\\([!-]?\\w+(\\|\\||\\\\/|\\+)[!-]?\\w+\\))(/\\\\|\\*|&&)?)+$";
         if (!Pattern.matches(regex, str)) {
             throw new IllegalArgumentException("Argument " + str + " doesn't match regex");
         }
@@ -24,11 +23,12 @@ public class ConjunctiveNormalForm {
         ArrayList<String> pairs = new ArrayList<>();
         for (String subst : Arrays.stream(str.split("\\(")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
             for (String pair : Arrays.stream(subst.split("\\)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
-                String[] value = Arrays.stream(pair.split("(\\|\\||\\\\/)|(/\\\\|\\*|&&)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);
+                String[] value = Arrays.stream(pair.split("(\\|\\||\\\\/|\\+)|(/\\\\|\\*|&&)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);
                 if (value.length > 0) {
                     disjunctionMap.put(
                             idDisjunction++,
-                            new Disjunction(
+                            new Pair(
+                                    Pair.DISJUNCTION,
                                     value
                             )
                     );
@@ -41,7 +41,7 @@ public class ConjunctiveNormalForm {
 
     private void addLiteral(String literal, Integer idPair) {
         if (literal != null && !literal.isEmpty()) {
-            HashSet<Integer> pairs = new HashSet<>();
+            ArrayList<Integer> pairs = new ArrayList<>();
             if (literals.containsKey(literal)) {
                 pairs = literals.get(literal);
             }
@@ -52,11 +52,11 @@ public class ConjunctiveNormalForm {
         }
     }
 
-    public HashMap<String, HashSet<Integer>> getLiterals() {
+    public HashMap<String, ArrayList<Integer>> getLiterals() {
         return literals;
     }
 
-    public HashMap<Integer, Disjunction> getDisjunctionMap() {
+    public HashMap<Integer, Pair> getDisjunctionMap() {
         return disjunctionMap;
     }
 }
