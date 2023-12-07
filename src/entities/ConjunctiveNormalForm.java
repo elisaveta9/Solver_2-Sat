@@ -24,7 +24,6 @@ public class ConjunctiveNormalForm {
     }
 
     private void parseStr(String str) {
-        ArrayList<String> pairs = new ArrayList<>();
         for (String subst : Arrays.stream(str.split("\\(")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
             for (String pair : Arrays.stream(subst.split("\\)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
                 String[] value = Arrays.stream(pair.split("(\\|\\||\\\\/|\\+)|(/\\\\|\\*|&&)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);

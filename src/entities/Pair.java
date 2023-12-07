@@ -55,10 +55,6 @@ public class Pair {
         }
     }
 
-    public boolean isDoable() {
-        return !(literal1.equals(literal2) && sign1 != sign2);
-    }
-
     public boolean isDoable(boolean value1) {
         value1 = value1 != sign1;
         if (literal2.isEmpty()) {
@@ -123,6 +119,15 @@ public class Pair {
         return !literal2.isEmpty();
     }
 
+    public boolean getSign(String literal) {
+        if (literal.equals(literal1)) {
+            return sign1;
+        } else if (literal.equals(literal2)) {
+            return sign2;
+        }
+        throw new IllegalArgumentException("Unknown literal" + literal);
+    }
+
     public String getLiteral1() {
         return literal1;
     }
@@ -145,10 +150,8 @@ public class Pair {
     }
 
     private void addLiteral2(String literal2, boolean sign2) {
-        if (!(literal1.equals(literal2) && sign1 == sign2)) {
-            this.literal2 = literal2;
-            this.sign2 = sign2;
-        }
+        this.literal2 = literal2;
+        this.sign2 = sign2;
     }
 
     public void removeLiteral2() {
@@ -201,9 +204,7 @@ public class Pair {
             case EXCLUSIVE_DISJUNCTION -> {
                 return "(" + firstPart + "XOR" + secondPart + ")";
             }
-            default -> {
-                throw new IllegalArgumentException("Unknown type " + type);
-            }
+            default -> throw new IllegalArgumentException("Unknown type " + type);
         }
     }
 }
