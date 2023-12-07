@@ -25,13 +25,11 @@ public class Pair {
         if (disjunction.length > 2 || disjunction[0].isEmpty()) {
             throw new IllegalArgumentException("Uses more 2 literals");
         }
-        if (Pattern.matches("^[!-]\\w+$", disjunction[0])) {
-            sign1 = false;
-            literal1 = disjunction[0].substring(1);
-        } else {
-            sign1 = true;
-            literal1 = disjunction[0];
+        sign1 = !Pattern.matches("^[!-]\\w+$", disjunction[0]);
+        if (!sign1) {
+            disjunction[0] = disjunction[0].substring(1);
         }
+        literal1 = disjunction[0];
         if (disjunction.length == 2) {
             if (Pattern.matches("^[!-]\\w+$", disjunction[1])) {
                 sign2 = false;
@@ -160,12 +158,12 @@ public class Pair {
         sign2 = true;
     }
 
-    public void setSign1(boolean sign1) {
-        this.sign1 = sign1;
+    public void invertSign1() {
+        sign1 = !sign1;
     }
 
-    public void setSign2(boolean sign2) {
-        this.sign2 = sign2;
+    public void invertSign2() {
+        sign2 = !sign2;
     }
 
     @Override
