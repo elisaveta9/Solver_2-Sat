@@ -1,4 +1,4 @@
-package entities;
+package entities.core;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -55,7 +55,7 @@ public class Pair {
         }
     }
 
-    public boolean isDoable(boolean value1) {
+    public boolean isSatisfiable(boolean value1) {
         value1 = value1 != sign1;
         if (literal2.isEmpty()) {
             switch (type) {
@@ -81,7 +81,7 @@ public class Pair {
         throw new IllegalArgumentException("Unknown type operation " + type);
     }
 
-    public boolean isDoable(boolean value1, boolean value2) {
+    public boolean isSatisfiable(boolean value1, boolean value2) {
         value1 = value1 != sign1;
         value2 = value2 != sign2;
         switch (type) {
@@ -184,7 +184,7 @@ public class Pair {
     public String toString() {
         String firstPart = (sign1) ? literal1 : "!" + literal1, secondPart;
         if (!hasLiteral2()) {
-            secondPart = (sign2) ? "1" : "0";
+            return firstPart;
         } else {
             secondPart = (sign2) ? literal2 : "!" + literal2;
         }

@@ -1,5 +1,7 @@
 package entities;
 
+import entities.core.Pair;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -114,11 +116,11 @@ public class ConjunctiveNormalForm {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ConjunctiveNormalForm that = (ConjunctiveNormalForm) o;
-        return Objects.equals(literals, that.literals) && Objects.equals(pairHashMap, that.pairHashMap) && Objects.equals(idPair, that.idPair);
+        return Objects.equals(literals, that.literals) && Objects.equals(pairHashMap, that.pairHashMap);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(literals, pairHashMap, idPair);
+        return Objects.hash(literals, pairHashMap);
     }
 }

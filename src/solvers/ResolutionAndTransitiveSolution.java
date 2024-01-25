@@ -1,7 +1,7 @@
 package solvers;
 
 import entities.ConjunctiveNormalForm;
-import entities.Pair;
+import entities.core.Pair;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +16,7 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
         this.cnf = new ConjunctiveNormalForm(cnf);
     }
 
+    @Override
     public boolean solve() {
         if (!simplifyCnf()) {
             return false;
