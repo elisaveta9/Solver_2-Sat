@@ -10,8 +10,10 @@ public class PairWithValue {
     public static final int EQUIVALENCE = 3;
     public static final int EXCLUSIVE_DISJUNCTION = 4;
 
-    private Literal literal1 = new Literal("", true);
+    private Literal literal1 = new Literal("");
+    private boolean sign1 = true;
     private Literal literal2 = null;
+    private boolean sign2 = true;
     private int type;
 
     public PairWithValue(int type) {
@@ -23,8 +25,8 @@ public class PairWithValue {
         if (disjunction.length > 2 || disjunction[0].isEmpty()) {
             throw new IllegalArgumentException("Uses more 2 literals");
         }
-        literal1.sign = !Pattern.matches("^[!-]\\w+$", disjunction[0]);
-        if (!literal1.sign) {
+        sign1 = !Pattern.matches("^[!-]\\w+$", disjunction[0]);
+        if (!sign1) {
             disjunction[0] = disjunction[0].substring(1);
         }
         literal1.name = disjunction[0];
@@ -40,7 +42,13 @@ public class PairWithValue {
     public PairWithValue(int type, String literal1, boolean sign1) {
         setType(type);
         this.literal1.name = literal1;
-        this.literal1.sign = sign1;
+        this.sign1 = sign1;
+    }
+
+    public PairWithValue(int type, Literal literal1, boolean sign1) {
+        setType(type);
+        this.literal1 = literal1;
+        this.sign1 = sign1;
     }
 
     public PairWithValue(int type, String literal1, boolean sign1, String literal2, boolean sign2) {
@@ -51,19 +59,21 @@ public class PairWithValue {
         }
     }
 
-    public PairWithValue(Literal literal1, Literal literal2, int type) {
+    public PairWithValue(Literal literal1, boolean sign1, Literal literal2, boolean sign2, int type) {
         this.literal1 = literal1;
+        this.sign1 = sign1;
         this.literal2 = literal2;
+        this.sign2 = sign2;
         this.type = type;
     }
 
     public int getSatisfiable() {
-        if (literal1.getValue() == Literal.UNINITIATED && literal2.getValue() == Literal.UNINITIATED) {
+        if (type != DISJUNCTION && literal1.getValue(sign1) == Literal.UNINITIATED && literal2.getValue(sign2) == Literal.UNINITIATED) {
             return Literal.UNINITIATED;
         }
         switch (type) {
             case CONJUNCTION -> {
-                int value1 = literal1.getValue(), value2 = literal2.getValue();
+                int value1 = literal1.getValue(sign1), value2 = literal2.getValue(sign2);
                 if (value1 == Literal.TRUE && value2 == Literal.TRUE) {
                     return Literal.TRUE;
                 }
@@ -73,10 +83,10 @@ public class PairWithValue {
                 return Literal.UNINITIATED;
             }
             case DISJUNCTION -> {
-                int value1 = literal1.getValue(), value2 = literal2.getValue();
+                int value1 = literal1.getValue(sign1), value2 = literal2.getValue(sign2);
                 if (value1 == Literal.TRUE || value2 == Literal.TRUE ||
-                        (value1 == Literal.UNINITIATED && !literal1.sign) ||
-                        (value2 == Literal.UNINITIATED && !literal2.sign)) {
+                        (value1 == Literal.UNINITIATED && !sign1) ||
+                        (value2 == Literal.UNINITIATED && !sign2)) {
                     return Literal.TRUE;
                 }
                 if (value1 == Literal.FALSE && value2 == Literal.FALSE) {
@@ -85,7 +95,7 @@ public class PairWithValue {
                 return Literal.UNINITIATED;
             }
             case IMPLICATION -> {
-                int value1 = literal1.getValue(), value2 = literal2.getValue();
+                int value1 = literal1.getValue(sign1), value2 = literal2.getValue(sign2);
                 if (value1 == Literal.TRUE && value2 == Literal.FALSE) {
                     return Literal.FALSE;
                 }
@@ -97,7 +107,7 @@ public class PairWithValue {
                 return  answer;
             }
             case EQUIVALENCE -> {
-                int value1 = literal1.getValue(), value2 = literal2.getValue();
+                int value1 = literal1.getValue(sign1), value2 = literal2.getValue(sign2);
                 if (value1 == value2 && value1 != Literal.UNINITIATED) {
                     return Literal.TRUE;
                 }
@@ -107,7 +117,7 @@ public class PairWithValue {
                 return Literal.UNINITIATED;
             }
             case EXCLUSIVE_DISJUNCTION -> {
-                int value1 = literal1.getValue(), value2 = literal2.getValue();
+                int value1 = literal1.getValue(sign1), value2 = literal2.getValue(sign2);
                 if (value1 == value2 && value1 != Literal.UNINITIATED) {
                     return Literal.FALSE;
                 }
@@ -139,9 +149,9 @@ public class PairWithValue {
 
     public boolean getSign(String literal) {
         if (literal.equals(literal1.name)) {
-            return literal1.sign;
+            return sign1;
         } else if (literal.equals(literal2.name)) {
-            return literal2.sign;
+            return sign2;
         }
         throw new IllegalArgumentException("Unknown literal" + literal);
     }
@@ -151,7 +161,7 @@ public class PairWithValue {
     }
 
     public boolean isSign1() {
-        return literal1.sign;
+        return sign1;
     }
 
     public Literal getLiteral2() {
@@ -159,15 +169,17 @@ public class PairWithValue {
     }
 
     public boolean isSign2() {
-        return literal2.sign;
+        return sign2;
     }
 
     public void addLiteral1(String literal1, boolean sign1) {
-        this.literal1 = new Literal(literal1, sign1);
+        this.literal1 = new Literal(literal1);
+        this.sign1 = sign1;
     }
 
-    public void addLiteral1(Literal literal) {
+    public void addLiteral1(Literal literal, boolean sign) {
         this.literal1 = literal;
+        sign1 = sign;
     }
 
     public void addLiteral2(String literal2, boolean sign2) {
@@ -175,15 +187,25 @@ public class PairWithValue {
             addLiteral1(literal2, sign2);
             return;
         }
-        this.literal2 = new Literal(literal2, sign2);
+        this.literal2 = new Literal(literal2);
+        this.sign2 = sign2;
     }
 
-    public void addLiteral2(Literal literal) {
+    public void addLiteral2(Literal literal, boolean sign) {
         if (literal1 == null) {
-            addLiteral1(literal);
+            addLiteral1(literal, sign);
             return;
         }
         this.literal2 = literal;
+        sign2 = sign;
+    }
+
+    public void setSign1(boolean sign1) {
+        this.sign1 = sign1;
+    }
+
+    public void setSign2(boolean sign2) {
+        this.sign2 = sign2;
     }
 
     public void removeLiteral2() {
@@ -191,11 +213,11 @@ public class PairWithValue {
     }
 
     public void invertSign1() {
-        literal1.sign = !literal1.sign;
+        sign1 = !sign1;
     }
 
     public void invertSign2() {
-        literal2.sign = !literal2.sign;
+        sign2 = !sign2;
     }
 
     @Override
@@ -215,19 +237,19 @@ public class PairWithValue {
     public String toString() {
         switch (type) {
             case CONJUNCTION -> {
-                return "(" + literal1.toString() + "*" + literal2.toString() + ")";
+                return "(" + literal1.toString(sign1) + "*" + literal2.toString(sign2) + ")";
             }
             case DISJUNCTION -> {
-                return "(" + literal1.toString() + "+" + literal2.toString() + ")";
+                return "(" + literal1.toString(sign1) + "+" + literal2.toString(sign2) + ")";
             }
             case IMPLICATION -> {
-                return "(" + literal1.toString() + "->" + literal2.toString() + ")";
+                return "(" + literal1.toString(sign1) + "->" + literal2.toString(sign2) + ")";
             }
             case EQUIVALENCE -> {
-                return "(" + literal1.toString() + "<->" + literal2.toString() + ")";
+                return "(" + literal1.toString(sign1) + "<->" + literal2.toString(sign2) + ")";
             }
             case EXCLUSIVE_DISJUNCTION -> {
-                return "(" + literal1.toString() + "XOR" + literal2.toString() + ")";
+                return "(" + literal1.toString(sign1) + "XOR" + literal2.toString(sign2) + ")";
             }
             default -> throw new IllegalArgumentException("Unknown type " + type);
         }

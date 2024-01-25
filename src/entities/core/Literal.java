@@ -8,18 +8,20 @@ public class Literal implements Comparable<Literal> {
     public static final int FALSE = 2;
 
     public String name;
-    public boolean sign;
-    private int value;
+    public int value;
 
-    public Literal(String name, boolean sign) {
+    public Literal(Literal literal) {
+        name = literal.name;
+        value = literal.value;
+    }
+
+    public Literal(String name) {
         this.name = name;
-        this.sign = sign;
         this.value = UNINITIATED;
     }
 
-    public Literal(String name, boolean sign, int value) {
+    public Literal(String name, int value) {
         this.name = name;
-        this.sign = sign;
         this.value = value;
     }
 
@@ -31,15 +33,7 @@ public class Literal implements Comparable<Literal> {
         this.name = name;
     }
 
-    public boolean isSign() {
-        return sign;
-    }
-
-    public void setSign(boolean sign) {
-        this.sign = sign;
-    }
-
-    public int getValue() {
+    public int getValue(boolean sign) {
         if (value == UNINITIATED) {
             return value;
         }
@@ -58,8 +52,7 @@ public class Literal implements Comparable<Literal> {
         this.value = value;
     }
 
-    @Override
-    public String toString() {
+    public String toString(boolean sign) {
         return sign ? name : "!" + name;
     }
 
@@ -68,16 +61,16 @@ public class Literal implements Comparable<Literal> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Literal literal = (Literal) o;
-        return sign == literal.sign && value == literal.value && Objects.equals(name, literal.name);
+        return value == literal.value && Objects.equals(name, literal.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, sign, value);
+        return Objects.hash(name, value);
     }
 
     @Override
     public int compareTo(Literal o) {
-        return o.toString().compareTo(this.toString());
+        return this.toString().compareTo(o.toString());
     }
 }
