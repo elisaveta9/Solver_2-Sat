@@ -37,7 +37,13 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
                 for (Integer idPair : value) {
                     Pair pair = pairs.get(idPair);
                     if (prevPair != null) {
-                        if (prevPair.equals(pair)) {
+                        Pair simple = simplifyPair(pair, prevPair);
+                        if (simple != null) {
+                            int id = (pair.hasLiteral2()) ? idPair : idPrevPair;
+                            cnf.removePair(id);
+                            cnf.addPair(simple);
+                        }
+                        else if (prevPair.equals(pair)) {
                             cnf.removePair(idPair);
                             flag = true;
                         } else {
@@ -99,13 +105,9 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
         }
         return (pair1.getLiteral1().equals(pair2.getLiteral2()) &&
                 pair2.getLiteral1().equals(pair1.getLiteral2()) &&
+                pair1.getLiteral1().equals(pair1.getLiteral2()) &&
                 pair1.isSign1() != pair2.isSign2() &&
-                pair2.isSign1() != pair1.isSign2()) || (
-                pair1.getLiteral1().equals(pair2.getLiteral1()) &&
-                pair1.getLiteral2().equals(pair2.getLiteral2()) &&
-                pair1.isSign1() != pair2.isSign1() &&
-                pair1.isSign2() != pair2.isSign2()
-        );
+                pair2.isSign1() != pair1.isSign2());
     }
 
     private Pair unionPairs(Pair pair1, Pair pair2) {
@@ -163,6 +165,28 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
                 literal1,
                 sign1
         );
+    }
+
+    private Pair simplifyPair(Pair pair1, Pair pair2) {
+        if (pair1.hasLiteral2() && pair2.hasLiteral2()) {
+            return null;
+        }
+        Pair a = (pair1.hasLiteral2()) ? pair1 : pair2,
+                b = (pair1.hasLiteral2()) ? pair2 : pair1;
+        int id = (a.getLiteral1().equals(b.getLiteral1()) && a.isSign1() != b.isSign1()) ? 1 :
+                (a.getLiteral2().equals(b.getLiteral1()) && a.isSign2() != b.isSign1()) ? 2 : 0;
+        switch (id) {
+            case 0 -> {
+                return null;
+            }
+            case 1 -> {
+                return new Pair(a.getType(), a.getLiteral2(), a.isSign2());
+            }
+            case 2 -> {
+                return new Pair(a.getType(), a.getLiteral1(), a.isSign1());
+            }
+        }
+        return null;
     }
 
     private String canReduce(Pair pair1, Pair pair2) {

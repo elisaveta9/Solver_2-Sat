@@ -16,6 +16,14 @@ public class Pair {
     private boolean sign2 = true;
     private int type;
 
+    public Pair(Pair pair) {
+        literal1 = pair.literal1;
+        literal2 = pair.literal2;
+        sign1 = pair.sign1;
+        sign2 = pair.sign2;
+        type = pair.type;
+    }
+
     public Pair(int type) {
         setType(type);
     }
@@ -116,7 +124,7 @@ public class Pair {
     }
 
     public boolean hasLiteral2() {
-        return !literal2.isEmpty();
+        return literal2 == null || !literal2.isEmpty();
     }
 
     public boolean getSign(String literal) {
@@ -154,8 +162,14 @@ public class Pair {
         this.sign2 = sign2;
     }
 
+    public void removeLiteral1() {
+        literal1 = literal2;
+        sign1 = sign2;
+        removeLiteral2();
+    }
+
     public void removeLiteral2() {
-        literal2 = null;
+        literal2 = "";
         sign2 = true;
     }
 

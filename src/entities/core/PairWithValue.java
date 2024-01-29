@@ -68,6 +68,8 @@ public class PairWithValue {
     }
 
     public int getSatisfiable() {
+        if (literal2 == null)
+            return literal1.getValue(sign1);
         if (type != DISJUNCTION && literal1.getValue(sign1) == Literal.UNINITIATED && literal2.getValue(sign2) == Literal.UNINITIATED) {
             return Literal.UNINITIATED;
         }
@@ -144,7 +146,7 @@ public class PairWithValue {
     }
 
     public boolean hasLiteral2() {
-        return !literal2.name.isEmpty();
+        return literal2 != null;
     }
 
     public boolean getSign(String literal) {
@@ -235,21 +237,27 @@ public class PairWithValue {
 
     @Override
     public String toString() {
+        String firstPart = literal1.toString(sign1), secondPart;
+        if (!hasLiteral2()) {
+            return firstPart;
+        } else {
+            secondPart = literal2.toString(sign2);
+        }
         switch (type) {
             case CONJUNCTION -> {
-                return "(" + literal1.toString(sign1) + "*" + literal2.toString(sign2) + ")";
+                return "(" + firstPart + "*" + secondPart + ")";
             }
             case DISJUNCTION -> {
-                return "(" + literal1.toString(sign1) + "+" + literal2.toString(sign2) + ")";
+                return "(" + firstPart + "+" + secondPart + ")";
             }
             case IMPLICATION -> {
-                return "(" + literal1.toString(sign1) + "->" + literal2.toString(sign2) + ")";
+                return "(" + firstPart + "->" + secondPart + ")";
             }
             case EQUIVALENCE -> {
-                return "(" + literal1.toString(sign1) + "<->" + literal2.toString(sign2) + ")";
+                return "(" + firstPart + "<->" + secondPart + ")";
             }
             case EXCLUSIVE_DISJUNCTION -> {
-                return "(" + literal1.toString(sign1) + "XOR" + literal2.toString(sign2) + ")";
+                return "(" + firstPart + "XOR" + secondPart + ")";
             }
             default -> throw new IllegalArgumentException("Unknown type " + type);
         }

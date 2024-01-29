@@ -27,25 +27,6 @@ public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSol
     @Override
     public boolean solve() {
         int result = getResult(0);
-        /*Map<Literal, IntHashSet> map = cnf.getLiterals().entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> a,
-                        LinkedHashMap::new
-                ));*/
-        /*Map<Literal, IntHashSet> map = cnf.getLiterals();
-        for (Map.Entry<Literal, IntHashSet> pair : map.entrySet()) {
-            Literal literal = pair.getKey();
-            //int value = getValue(literal, pair.getValue(),
-            //        literalInv, map.containsKey(literalInv) ? map.get(literalInv) : new IntHashSet());
-            literal.setValue(Literal.TRUE);
-            if (cnf.getSatisfiable() == Literal.FALSE)
-                literal.setValue(Literal.UNINITIATED);
-        }
-        int result = cnf.getSatisfiable();*/
         return result == Literal.TRUE;
     }
 
