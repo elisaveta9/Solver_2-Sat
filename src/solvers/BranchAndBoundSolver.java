@@ -13,7 +13,7 @@ public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSol
 
     private final ConjunctiveNormalFormWithValue cnf;
     private List<Literal> literals;
-    private List<Literal> solution = new ArrayList<>();
+    private List<Literal> solution;
 
     public BranchAndBoundSolver(ConjunctiveNormalFormWithValue cnf) {
         this.cnf = new ConjunctiveNormalFormWithValue(cnf);
@@ -21,7 +21,8 @@ public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSol
 
     public BranchAndBoundSolver(ConjunctiveNormalForm cnf) {
         this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-        this.literals = this.cnf.getLiterals();
+        literals = this.cnf.getLiterals();
+        solution = new ArrayList<>();
     }
 
     @Override
@@ -61,20 +62,4 @@ public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSol
     public String toString() {
         return cnf.toString();
     }
-/*private int getValue(Literal literal1, IntHashSet set1, Literal literal2, IntHashSet set2) {
-        Map<Integer, PairWithValue> map = cnf.getPairHashMap();
-        int c1 = 0, c2 = 0;
-        for (Integer id : set1) {
-            if (map.get(id).getSatisfiable() == Literal.FALSE)
-                c1++;
-        }
-        for (Integer id : set2) {
-            if (map.get(id).getSatisfiable() == Literal.FALSE)
-                c2++;
-        }
-        if (c1 > c2) {
-            return literal1.sign ? Literal.TRUE : Literal.FALSE;
-        }
-        return literal2.sign ? Literal.TRUE : Literal.FALSE;
-    }*/
 }
