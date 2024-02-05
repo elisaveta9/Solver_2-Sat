@@ -30,7 +30,11 @@ public class ConjunctiveNormalForm {
             for (String pair : Arrays.stream(subst.split("\\)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
                 String[] value = Arrays.stream(pair.split("(\\|\\||\\\\/|\\+)|(/\\\\|\\*|&&)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);
                 if (value.length > 0) {
-                    pairHashMap.put(
+                    addPair(new Pair(
+                            Pair.DISJUNCTION,
+                            value
+                    ));
+                    /*pairHashMap.put(
                             idPair++,
                             new Pair(
                                     Pair.DISJUNCTION,
@@ -38,7 +42,7 @@ public class ConjunctiveNormalForm {
                             )
                     );
                     addLiteral(pairHashMap.get(idPair - 1).getLiteral1(), idPair - 1);
-                    addLiteral(pairHashMap.get(idPair - 1).getLiteral2(), idPair - 1);
+                    addLiteral(pairHashMap.get(idPair - 1).getLiteral2(), idPair - 1);*/
                 }
             }
         }

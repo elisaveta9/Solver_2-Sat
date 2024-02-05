@@ -33,18 +33,18 @@ public class Pair {
         if (disjunction.length > 2 || disjunction[0].isEmpty()) {
             throw new IllegalArgumentException("Uses more 2 literals");
         }
-        sign1 = !Pattern.matches("^[!-]\\w+$", disjunction[0]);
-        if (!sign1) {
-            disjunction[0] = disjunction[0].substring(1);
-        }
-        literal1 = disjunction[0];
-        if (disjunction.length == 2) {
+        if (disjunction.length == 2 && !disjunction[0].equals(disjunction[1])) {
             boolean sign2 = !Pattern.matches("^[!-]\\w+$", disjunction[1]);
             if (!sign2) {
                 disjunction[1] = disjunction[1].substring(1);
             }
             addLiteral2(disjunction[1], sign2);
         }
+        sign1 = !Pattern.matches("^[!-]\\w+$", disjunction[0]);
+        if (!sign1) {
+            disjunction[0] = disjunction[0].substring(1);
+        }
+        literal1 = disjunction[0];
     }
 
     public Pair(int type, String literal1, boolean sign1) {
