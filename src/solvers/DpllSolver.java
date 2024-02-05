@@ -3,24 +3,19 @@ package solvers;
 import entities.ConjunctiveNormalForm;
 import entities.ConjunctiveNormalFormWithValue;
 import entities.core.Literal;
-import entities.core.Pair;
 import entities.core.PairWithValue;
 
 import java.util.*;
 
 public class DpllSolver implements ConjunctiveNormalFormSolver {
-    private final ConjunctiveNormalForm cnf;
-    private ConjunctiveNormalFormWithValue simpleCnf;
-    private Map<String, HashSet<Integer>> cnfLiterals;
-    private List<Literal> literals;
+    private final ConjunctiveNormalFormWithValue simpleCnf;
+    private final Map<String, HashSet<Integer>> cnfLiterals;
     private List<Literal> unsetLiterals;
 
     public DpllSolver(ConjunctiveNormalForm cnf) {
-        this.cnf = cnf;
         simpleCnf = new ConjunctiveNormalFormWithValue(cnf);
         cnfLiterals = cnf.getLiterals();
-        literals = simpleCnf.getLiterals();
-        unsetLiterals = new ArrayList<>(literals);
+        unsetLiterals = new ArrayList<>(simpleCnf.getLiterals().stream().toList());
     }
 
     @Override
@@ -60,7 +55,6 @@ public class DpllSolver implements ConjunctiveNormalFormSolver {
             int countL = 0, countInvL = 0;
             for (Integer idPair : pairsL) {
                 PairWithValue pair = pairs.get(idPair);
-                int sat = pair.getSatisfiable();
                 if ((pair.getLiteral1().value == Literal.UNINITIATED &&
                         (!pair.hasLiteral2() || pair.getLiteral2().value == Literal.UNINITIATED)) ||
                         ((pair.getLiteral1().equals(literal) && pair.getLiteral2().getValue(pair.isSign2()) != Literal.TRUE) ||

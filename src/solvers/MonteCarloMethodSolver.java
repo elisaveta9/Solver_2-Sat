@@ -11,12 +11,12 @@ public class MonteCarloMethodSolver implements ConjunctiveNormalFormSolver {
 
 
     private final ConjunctiveNormalFormWithValue cnf;
-    private List<Literal> literals;
+    private final List<Literal> literals;
     private final Random random = new Random();
 
     public MonteCarloMethodSolver(ConjunctiveNormalForm cnf) {
         this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-        literals = this.cnf.getLiterals();
+        literals = this.cnf.getLiterals().stream().toList();
     }
 
     @Override

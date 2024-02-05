@@ -1,13 +1,6 @@
 import entities.ConjunctiveNormalForm;
-import entities.Graph;
-import entities.core.Literal;
-import entities.core.PairWithValue;
-import solvers.BranchAndBoundSolver;
-import solvers.ConjunctiveNormalFormSolver;
-import solvers.ResolutionAndTransitiveSolution;
-import solvers.StronglyConnectedComponentsSolver;
+import solvers.*;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -17,7 +10,7 @@ public class Main {
         String question = in.nextLine();
         ConjunctiveNormalForm con = new ConjunctiveNormalForm("(X0+!X1)*(X1+X2)*(X0+X3)*(X2+!X3)*(X1+!X4)*(X2+!X5)*(X1+!X5)*(!X2+!X5)*(!X3+!X6)*(!X0+X7)*(!X4+!X7)*(X5+!X7)*(!X4+!X8)*(!X7+!X8)*(!X7+X8)*(X1+!X8)*(X0+!X8)");
         ConjunctiveNormalForm que = new ConjunctiveNormalForm(question);
-        ConjunctiveNormalFormSolver solver = new StronglyConnectedComponentsSolver(que);
+        ConjunctiveNormalFormSolver solver = new DpllSolver(que);
         System.out.println(solver.solve());
         solver = new BranchAndBoundSolver(que);
         System.out.println(solver.solve());

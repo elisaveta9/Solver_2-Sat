@@ -11,7 +11,7 @@ public class StronglyConnectedComponentsSolver implements ConjunctiveNormalFormS
     private final HashMap<String, Boolean> used = new HashMap<>();
     private final TreeMap<String, Integer> components = new TreeMap<>();
     private int current_component = 0;
-    private Deque<String> queue = new LinkedList<>();
+    private final Deque<String> queue = new LinkedList<>();
 
     public StronglyConnectedComponentsSolver(ConjunctiveNormalForm cnf) {
         graph = new Graph(cnf);

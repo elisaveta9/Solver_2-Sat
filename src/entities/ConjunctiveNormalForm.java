@@ -34,15 +34,6 @@ public class ConjunctiveNormalForm {
                             Pair.DISJUNCTION,
                             value
                     ));
-                    /*pairHashMap.put(
-                            idPair++,
-                            new Pair(
-                                    Pair.DISJUNCTION,
-                                    value
-                            )
-                    );
-                    addLiteral(pairHashMap.get(idPair - 1).getLiteral1(), idPair - 1);
-                    addLiteral(pairHashMap.get(idPair - 1).getLiteral2(), idPair - 1);*/
                 }
             }
         }
@@ -81,15 +72,14 @@ public class ConjunctiveNormalForm {
         idPair++;
     }
 
-    public boolean removePair(Integer id) {
+    public void removePair(Integer id) {
         if (!pairHashMap.containsKey(id)) {
-            return false;
+            return;
         }
         Pair pair = pairHashMap.get(id);
         pairHashMap.remove(id);
         removePairLiteral(pair.getLiteral1(), id);
         removePairLiteral(pair.getLiteral2(), id);
-        return true;
     }
 
     public HashMap<String, HashSet<Integer>> getLiterals() {

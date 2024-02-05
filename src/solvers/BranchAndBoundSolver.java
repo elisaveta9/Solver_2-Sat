@@ -2,12 +2,9 @@ package solvers;
 
 import entities.ConjunctiveNormalForm;
 import entities.ConjunctiveNormalFormWithValue;
-import entities.core.IntHashSet;
 import entities.core.Literal;
-import entities.core.PairWithValue;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSolution{
 
@@ -21,7 +18,7 @@ public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSol
 
     public BranchAndBoundSolver(ConjunctiveNormalForm cnf) {
         this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-        literals = this.cnf.getLiterals();
+        literals = this.cnf.getLiterals().stream().toList();
         solution = new ArrayList<>();
     }
 
