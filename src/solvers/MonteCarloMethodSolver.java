@@ -30,6 +30,15 @@ public class MonteCarloMethodSolver implements ConjunctiveNormalFormSolver {
         return false;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (Literal literal : literals) {
+            result.append(literal.name).append(" : ").append(literal.value == Literal.TRUE).append("; ");
+        }
+        return result.toString();
+    }
+
     public int nextValue() {
         for (Literal l : literals) {
             l.value = random.nextBoolean() ? Literal.TRUE : Literal.FALSE;

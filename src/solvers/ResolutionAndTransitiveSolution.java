@@ -132,7 +132,8 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
     }
 
     private Pair reducePair(Pair pair1, Pair pair2) {
-        if (pair1.hasLiteral2() && pair2.hasLiteral2()) {
+        if ((pair1.hasLiteral2() && pair2.hasLiteral2()) ||
+                (!pair1.hasLiteral2() && !pair2.hasLiteral2())) {
             return null;
         }
         Pair a = (pair1.hasLiteral2()) ? pair1 : pair2,

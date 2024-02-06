@@ -2,6 +2,7 @@ package entities;
 
 import entities.core.Pair;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -11,8 +12,14 @@ public class ConjunctiveNormalForm {
     private HashMap<Integer, Pair> pairHashMap = new HashMap<>();
     private int idPair = 0;
 
+    public ConjunctiveNormalForm() { }
+
     public ConjunctiveNormalForm(String str) {
-        String regex = "^(([!-]?\\w+)|(\\([!-]?\\w+(\\|\\||\\\\/|\\+)[!-]?\\w+\\))(/\\\\|\\*|&&)?)+$";
+        str = str.replace("/\\", "*");
+        str = str.replace("&&", "*");
+        str = str.replace("\\/", "+");
+        str = str.replace("||", "+");
+        String regex = "^(((!?[a-zA-Z\\d]+)|(\\(!?[a-zA-Z\\d]+\\+!?[a-zA-Z\\d]+\\)))+\\*?)+$";
         if (!Pattern.matches(regex, str)) {
             throw new IllegalArgumentException("Argument " + str + " doesn't match regex");
         }
@@ -26,9 +33,10 @@ public class ConjunctiveNormalForm {
     }
 
     private void parseStr(String str) {
-        for (String subst : Arrays.stream(str.split("\\(")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
-            for (String pair : Arrays.stream(subst.split("\\)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
-                String[] value = Arrays.stream(pair.split("(\\|\\||\\\\/|\\+)|(/\\\\|\\*|&&)")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);
+
+        for (String subst : Arrays.stream(str.split("\\*")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
+            for (String pair : Arrays.stream(subst.split("(\\()|(\\))")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new)) {
+                String[] value = Arrays.stream(pair.split("\\+")).filter(e -> !e.trim().isEmpty()).toArray(String[]::new);
                 if (value.length > 0) {
                     addPair(new Pair(
                             Pair.DISJUNCTION,

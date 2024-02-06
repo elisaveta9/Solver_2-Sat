@@ -152,9 +152,11 @@ public class Pair {
         return sign2;
     }
 
-    public void addLiteral1(String literal1, boolean sign1) {
-        this.literal1 = literal1;
-        this.sign1 = sign1;
+    public void addLiteral(String literal1, boolean sign1) {
+        if (this.literal1 == null || this.literal1.isEmpty()) {
+            this.literal1 = literal1;
+            this.sign1 = sign1;
+        } else addLiteral2(literal1, sign1);
     }
 
     private void addLiteral2(String literal2, boolean sign2) {
