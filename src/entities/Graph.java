@@ -18,10 +18,7 @@ public class Graph {
             HashSet<Integer> value = new HashSet<>(set.getValue());
             for (Integer idPair : value) {
                 Pair pair = pairs.get(idPair);
-                if (!pair.hasLiteral2()) {
-                    addVertexValue(graph, new LiteralWithSign(pair.getLiteral1(), pair.isSign1()).toString(), null);
-                    addVertexValue(graph, new LiteralWithSign(pair.getLiteral1(), !pair.isSign1()).toString(), null);
-                } else {
+                if (pair.hasLiteral2()) {
                     addVertexValue(
                             graph,
                             new LiteralWithSign(pair.getLiteral1(), !pair.isSign1()).toString(),
@@ -30,6 +27,12 @@ public class Graph {
                             graph,
                             new LiteralWithSign(pair.getLiteral2(), !pair.isSign2()).toString(),
                             new LiteralWithSign(pair.getLiteral1(), pair.isSign1()).toString());
+                } else {
+                    addVertexValue(
+                            graph,
+                            new LiteralWithSign(pair.getLiteral1(), !pair.isSign1()).toString(),
+                            new LiteralWithSign(pair.getLiteral1(), pair.isSign1()).toString()
+                    );
                 }
             }
         }

@@ -25,9 +25,10 @@ public class StronglyConnectedComponentsSolver implements ConjunctiveNormalFormS
 
     @Override
     public boolean solve() {
-        for (String l : gt.getVertexes()) {
+        HashSet<String> vertexes = graph.getVertexes();
+        for (String l : vertexes) {
             if (!used.get(l))
-                dfs1(l);
+                dfs1(l, graph);
         }
         while (!queue.isEmpty()) {
             String vertex = queue.pollLast();
@@ -38,6 +39,7 @@ public class StronglyConnectedComponentsSolver implements ConjunctiveNormalFormS
         }
         for (String literal : components.keySet()) {
             if (literal.charAt(0) != '!' &&
+                    components.get(literal) != 0 &&
                     components.get(literal).equals(components.get("!" + literal))) {
                 return false;
             }
@@ -45,11 +47,11 @@ public class StronglyConnectedComponentsSolver implements ConjunctiveNormalFormS
         return true;
     }
 
-    private void dfs1(String v) {
+    private void dfs1(String v, Graph g) {
         used.put(v, true);
-        for (String to : graph.getVertexes(v)) {
+        for (String to : g.getVertexes(v)) {
             if (!used.get(to)) {
-                dfs1(to);
+                dfs1(to, g);
             }
         }
         queue.add(v);

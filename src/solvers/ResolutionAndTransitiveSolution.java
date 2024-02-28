@@ -36,6 +36,7 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
                 if (value.size() > 1) {
                     for (Integer idPair : value) {
                         Pair pair = pairs.get(idPair);
+                        Response smp = null;
                         if (prevPair != null) {
                             if (prevPair.equals(pair)) {
                                 cnf.removePair(idPair);
@@ -44,12 +45,23 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
                                 if (isContradictory(prevPair, pair)) {
                                     return false;
                                 }
-                                boolean smp = simplifyPair(pair, idPair, prevPair, idPrevPair);
-                                if (smp) flag = true;
+                                smp = simplifyPair(pair, idPair, prevPair, idPrevPair);
                             }
                         }
-                        prevPair = pair;
-                        idPrevPair = idPair;
+                        if (smp == null) {
+                            prevPair = pair;
+                            idPrevPair = idPair;
+                        } else if (smp.removedPairs == 2) {
+                            prevPair = smp.resultPair;
+                            idPrevPair = smp.idNewPair;
+                            flag = true;
+                        } else {
+                            flag = true;
+                            if (!pair.hasLiteral2()) {
+                                prevPair = pair;
+                                idPrevPair = idPair;
+                            }
+                        }
                     }
                 }
             }
@@ -131,24 +143,28 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
         );
     }
 
-    private Pair reducePair(Pair pair1, Pair pair2) {
+    private Response reducePair(Pair pair1, Pair pair2) {
         if ((pair1.hasLiteral2() && pair2.hasLiteral2()) ||
                 (!pair1.hasLiteral2() && !pair2.hasLiteral2())) {
             return null;
         }
         Pair a = (pair1.hasLiteral2()) ? pair1 : pair2,
                 b = (pair1.hasLiteral2()) ? pair2 : pair1;
-        int id = (a.getLiteral1().equals(b.getLiteral1()) && a.isSign1() != b.isSign1()) ? 1 :
-                (a.getLiteral2().equals(b.getLiteral1()) && a.isSign2() != b.isSign1()) ? 2 : 0;
+        int id = (a.getLiteral1().equals(b.getLiteral1())) ? 1 :
+                (a.getLiteral2().equals(b.getLiteral1())) ? 2 : 0;
         switch (id) {
             case 0 -> {
                 return null;
             }
             case 1 -> {
-                return new Pair(a.getType(), a.getLiteral2(), a.isSign2());
+                Pair p = (a.isSign1() != b.isSign1()) ? new Pair(a.getType(), a.getLiteral2(), a.isSign2()) :
+                        null;
+                return new Response(1, p);
             }
             case 2 -> {
-                return new Pair(a.getType(), a.getLiteral1(), a.isSign1());
+                Pair p = (a.isSign2() != b.isSign1()) ? new Pair(a.getType(), a.getLiteral1(), a.isSign1()) :
+                        null;
+                return new Response(1, p);
             }
         }
         return null;
@@ -177,25 +193,27 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
         );
     }
 
-    private boolean simplifyPair(Pair pair1, int idPair, Pair pair2, int idPrevPair) {
-        Pair resultPair = reducePair(pair1, pair2);
-        if (resultPair != null) {
+    private Response simplifyPair(Pair pair1, int idPair, Pair pair2, int idPrevPair) {
+        Response result = reducePair(pair1, pair2);
+        if (result != null) {
             int id = (pair1.hasLiteral2()) ? idPair : idPrevPair;
             cnf.removePair(id);
-            cnf.addPair(resultPair);
-            return true;
+            if (result.resultPair != null) {
+                int idNewPair = cnf.addPair(result.resultPair);
+            }
+            return result;
         }
-        resultPair = reducePairs(pair1, pair2);
+        Pair resultPair = reducePairs(pair1, pair2);
         if (resultPair == null) {
             resultPair = unionPairs(pair1, pair2);
         }
         if (resultPair != null) {
             cnf.removePair(idPrevPair);
             cnf.removePair(idPair);
-            cnf.addPair(resultPair);
-            return true;
+            int idNewPair = cnf.addPair(resultPair);
+            return new Response(2, idNewPair, resultPair);
         }
-        return false;
+        return null;
     }
 
     private String canReduce(Pair pair1, Pair pair2) {
@@ -240,5 +258,22 @@ public class ResolutionAndTransitiveSolution implements ConjunctiveNormalFormSol
     @Override
     public String toString() {
         return cnf.toString();
+    }
+
+    private static class Response {
+        public int removedPairs = 0;
+        public int idNewPair = 0;
+        public Pair resultPair;
+
+        public Response(int removedPairs, int idNewPair, Pair resultPair) {
+            this.removedPairs = removedPairs;
+            this.idNewPair = idNewPair;
+            this.resultPair = resultPair;
+        }
+
+        public Response(int removedPairs, Pair resultPair) {
+            this.removedPairs = removedPairs;
+            this.resultPair = resultPair;
+        }
     }
 }

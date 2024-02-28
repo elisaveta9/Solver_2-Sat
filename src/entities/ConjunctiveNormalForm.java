@@ -73,11 +73,15 @@ public class ConjunctiveNormalForm {
         }
     }
 
-    public void addPair(Pair pair) {
-        pairHashMap.put(idPair, pair);
-        addLiteral(pair.getLiteral1(), idPair);
-        addLiteral(pair.getLiteral2(), idPair);
-        idPair++;
+    public int addPair(Pair pair) {
+        if (pair.getLiteral1() != null && pair.getLiteral2() != null) {
+            pairHashMap.put(idPair, pair);
+            addLiteral(pair.getLiteral1(), idPair);
+            addLiteral(pair.getLiteral2(), idPair);
+            idPair++;
+            return idPair - 1;
+        }
+        return -1;
     }
 
     public void removePair(Integer id) {

@@ -45,6 +45,10 @@ public class Pair {
             disjunction[0] = disjunction[0].substring(1);
         }
         literal1 = disjunction[0];
+        if (literal1.equals(literal2) && sign1 != sign2) {
+            literal1 = null;
+            literal2 = null;
+        }
     }
 
     public Pair(int type, String literal1, boolean sign1) {
@@ -160,8 +164,15 @@ public class Pair {
     }
 
     private void addLiteral2(String literal2, boolean sign2) {
-        this.literal2 = literal2;
-        this.sign2 = sign2;
+        if (literal2.equals(literal1)) {
+            if (sign1 != sign2) {
+                literal1 = null;
+                this.literal2 = null;
+            }
+        } else {
+            this.literal2 = literal2;
+            this.sign2 = sign2;
+        }
     }
 
     public void removeLiteral1() {
@@ -188,7 +199,8 @@ public class Pair {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pair that = (Pair) o;
-        return sign1 == that.sign1 && sign2 == that.sign2 && Objects.equals(literal1, that.literal1) && Objects.equals(literal2, that.literal2);
+        return sign1 == that.sign1 && sign2 == that.sign2 && Objects.equals(literal1, that.literal1) && Objects.equals(literal2, that.literal2) ||
+                sign2 == that.sign1 && sign1 == that.sign2 && Objects.equals(literal2, that.literal1) && Objects.equals(literal1, that.literal2);
     }
 
     @Override

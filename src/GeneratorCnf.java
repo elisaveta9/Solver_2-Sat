@@ -18,19 +18,22 @@ public class GeneratorCnf {
         for (int i = 0; i < literals; ++i) {
             listLiterals.add("X" + i);
         }
-        for (int i = 0; i < clauses; ++i) {
+        for (int i = 0; i < clauses; ) {
             Pair pair = new Pair(Pair.DISJUNCTION);
             pair.addLiteral(
                     listLiterals.get(Math.abs(random.nextInt() % literals)),
                     random.nextBoolean()
             );
-            if (random.nextBoolean()) {
+            //if (random.nextBoolean()) {
                 pair.addLiteral(
                         listLiterals.get(Math.abs(random.nextInt() % literals)),
                         random.nextBoolean()
                 );
+            //}
+            if (pair.getLiteral1() != null) {
+                cnf.addPair(pair);
+                ++i;
             }
-            cnf.addPair(pair);
         }
         return cnf;
     }
