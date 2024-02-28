@@ -1,72 +1,124 @@
 package entities.core;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class Literal implements Comparable<Literal> {
     public static final int UNINITIATED = 0;
     public static final int TRUE = 1;
     public static final int FALSE = 2;
-
     public String name;
-    public int value;
+    private Integer value;
+    private Integer sign;
+
+    public Literal(String src) {
+        parse(src);
+        value = UNINITIATED;
+    }
 
     public Literal(Literal literal) {
         name = literal.name;
         value = literal.value;
+        sign = literal.sign;
     }
 
-    public Literal(String name) {
-        this.name = name;
-        this.value = UNINITIATED;
+    public Literal(Literal literal, boolean saveValue) {
+        name = literal.name;
+        value = saveValue ? literal.value : UNINITIATED;
+        sign = literal.sign;
     }
 
-    public Literal(String name, int value) {
-        this.name = name;
+    public Literal(String src, int value) {
+        parse(src);
         this.value = value;
     }
 
-    public String getName() {
-        return name;
+    public Literal(String name, int value, boolean sign) {
+        parse(name);
+        this.sign = sign ? TRUE : FALSE;
+        this.value = value;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Literal(String name, int value, int sign) {
+        parse(name);
+        this.sign = sign;
+        this.value = value;
     }
 
-    public int getValue(boolean sign) {
-        if (value == UNINITIATED) {
-            return value;
-        }
-        if ((sign && value == TRUE) || (!sign && value == FALSE)) {
-            return TRUE;
-        }
-        if ((sign && value == FALSE) || (!sign && value == TRUE)) {
-            return FALSE;
-        }
-        throw new IllegalArgumentException("Unknown literal value " + value);
-    }
-
-    public void setValue(int value) {
+    public void setValue(Integer value) {
         if (value != UNINITIATED && value != TRUE && value != FALSE)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unknown value: " + value);
         this.value = value;
     }
 
-    public String toString(boolean sign) {
-        return sign ? name : "!" + name;
+    public Integer getValue() {
+        return this.value;
+    }
+
+    public void setSign(Integer sign) {
+        if (sign != UNINITIATED && sign != TRUE && sign != FALSE)
+            throw new IllegalArgumentException("Unknown value: " + sign);
+        this.sign = sign;
+    }
+
+    public Integer getSign() {
+        return sign;
+    }
+
+    public Integer isSatisfiable() {
+        return isSatisfiable(sign, value);
+    }
+
+    public Integer isSatisfiable(int sign, int value) {
+        switch (value) {
+            case UNINITIATED -> {
+                return UNINITIATED;
+            }
+            case TRUE -> {
+                return sign != FALSE ? TRUE : FALSE;
+            }
+            case FALSE -> {
+                return sign != FALSE ? FALSE : TRUE;
+            }
+            default -> throw new RuntimeException("Unknown value: " + value);
+        }
+    }
+
+    private void parse(String src) {
+        sign = Pattern.matches("^[-!][a-zа-яA-ZА-Я\\d]+$", src) ? FALSE :
+                Pattern.matches("^[a-zа-яA-ZА-Я\\d]+$", src) ? TRUE : UNINITIATED;
+        if (sign == UNINITIATED) {
+            throw new IllegalArgumentException("Wrong literal: " + src);
+        }
+        name = sign == TRUE ? src : src.substring(1);
+    }
+
+    public static Literal invertLiteral(Literal literal) {
+        Literal result = new Literal(literal);
+        result.sign = literal.sign == FALSE ? TRUE : FALSE;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return sign == FALSE ? "!" + name : name;
+    }
+
+    public String toString(Integer sign) {
+        return sign == FALSE ? "!" + name : name;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Literal literal = (Literal) o;
-        return value == literal.value && Objects.equals(name, literal.name);
+        Literal literal1 = (Literal) o;
+        return Objects.equals(name, literal1.name) && Objects.equals(value, literal1.value) && Objects.equals(sign, literal1.sign);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value);
+        return Objects.hash(name, value, sign);
     }
 
     @Override

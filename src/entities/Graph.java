@@ -1,7 +1,9 @@
 package entities;
 
-import entities.core.LiteralWithSign;
-import entities.core.Pair;
+import entities.core.Clause;
+import entities.core.Disjunction;
+import entities.core.Literal;
+import entities.core.SingleLiteral;
 
 import java.util.*;
 
@@ -13,27 +15,27 @@ public class Graph {
     }
 
     public Graph(ConjunctiveNormalForm cnf) {
-        HashMap<Integer, Pair> pairs = cnf.getPairHashMap();
-        for (Map.Entry<String, HashSet<Integer>> set : cnf.getLiterals().entrySet()) {
-            HashSet<Integer> value = new HashSet<>(set.getValue());
-            for (Integer idPair : value) {
-                Pair pair = pairs.get(idPair);
-                if (pair.hasLiteral2()) {
-                    addVertexValue(
-                            graph,
-                            new LiteralWithSign(pair.getLiteral1(), !pair.isSign1()).toString(),
-                            new LiteralWithSign(pair.getLiteral2(), pair.isSign2()).toString());
-                    addVertexValue(
-                            graph,
-                            new LiteralWithSign(pair.getLiteral2(), !pair.isSign2()).toString(),
-                            new LiteralWithSign(pair.getLiteral1(), pair.isSign1()).toString());
-                } else {
-                    addVertexValue(
-                            graph,
-                            new LiteralWithSign(pair.getLiteral1(), !pair.isSign1()).toString(),
-                            new LiteralWithSign(pair.getLiteral1(), pair.isSign1()).toString()
-                    );
-                }
+        Map<Integer, Clause> clauseMap = cnf.getClauseMap();
+        for (Clause clause : clauseMap.values()) {
+            if (clause instanceof SingleLiteral) {
+                Literal literal = clause.getLiteral(0, true);
+                addVertexValue(
+                        graph,
+                        Literal.invertLiteral(literal).toString(),
+                        literal.toString()
+                );
+            } else if (clause.getLiterals().size() == 2 && clause instanceof Disjunction) {
+                Literal literal1 = clause.getLiteral(0, true),
+                        literal2 = clause.getLiteral(1, true);
+                addVertexValue(
+                        graph,
+                        Literal.invertLiteral(literal1).toString(),
+                        literal2.toString());
+                addVertexValue(
+                        graph,
+                        Literal.invertLiteral(literal2).toString(),
+                        literal1.toString());
+
             }
         }
     }

@@ -1,9 +1,11 @@
 import entities.ConjunctiveNormalForm;
-import entities.core.Pair;
+import entities.core.Clause;
+import entities.core.Disjunction;
+import entities.core.Literal;
+import entities.core.SingleLiteral;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class GeneratorCnf {
@@ -14,27 +16,33 @@ public class GeneratorCnf {
             throw new IllegalArgumentException();
         }
         ConjunctiveNormalForm cnf = new ConjunctiveNormalForm();
-        List<String> listLiterals = new ArrayList<>();
+
+        List<String> literalsList = new ArrayList<>();
         for (int i = 0; i < literals; ++i) {
-            listLiterals.add("X" + i);
+            literalsList.add("X" + i);
         }
-        for (int i = 0; i < clauses; ) {
-            Pair pair = new Pair(Pair.DISJUNCTION);
-            pair.addLiteral(
-                    listLiterals.get(Math.abs(random.nextInt() % literals)),
-                    random.nextBoolean()
-            );
-            //if (random.nextBoolean()) {
-                pair.addLiteral(
-                        listLiterals.get(Math.abs(random.nextInt() % literals)),
-                        random.nextBoolean()
+
+        for (int i = 0; i < clauses; ++i) {
+            Clause clause;
+            if (random.nextInt() % 5 == 1) {
+                clause = new SingleLiteral(
+                        new Literal(literalsList.get(Math.abs(random.nextInt() % literals)), Literal.UNINITIATED),
+                        random.nextBoolean() ? Literal.TRUE : Literal.FALSE
                 );
-            //}
-            if (pair.getLiteral1() != null) {
-                cnf.addPair(pair);
-                ++i;
+            } else {
+                clause = new Disjunction();
+                clause.addLiteral(
+                        new Literal(literalsList.get(Math.abs(random.nextInt() % literals)), Literal.UNINITIATED),
+                        random.nextBoolean() ? Literal.TRUE : Literal.FALSE
+                );
+                clause.addLiteral(
+                        new Literal(literalsList.get(Math.abs(random.nextInt() % literals)), Literal.UNINITIATED),
+                        random.nextBoolean() ? Literal.TRUE : Literal.FALSE
+                );
             }
+            cnf.addClause(clause);
         }
+
         return cnf;
     }
 }

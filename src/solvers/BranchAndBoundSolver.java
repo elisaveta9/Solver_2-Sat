@@ -1,62 +1,35 @@
 package solvers;
 
 import entities.ConjunctiveNormalForm;
-import entities.ConjunctiveNormalFormWithValue;
 import entities.core.Literal;
 
 import java.util.*;
 
-public class BranchAndBoundSolver implements ConjunctiveNormalFormSolver, HasSolution{
-
-    private final ConjunctiveNormalFormWithValue cnf;
-    private List<Literal> literals;
-    private List<Literal> solution;
-
-    public BranchAndBoundSolver(ConjunctiveNormalFormWithValue cnf) {
-        this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-    }
-
-    public BranchAndBoundSolver(ConjunctiveNormalForm cnf) {
-        this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-        literals = this.cnf.getLiterals().stream().toList();
-        solution = new ArrayList<>();
-    }
-
-    @Override
-    public boolean solve() {
-        int result = getResult(0);
+public class BranchAndBoundSolver {
+    public static boolean solve(ConjunctiveNormalForm cnf) {
+        int result = getResult(0, cnf.getLiterals().stream().toList(), cnf);
         return result == Literal.TRUE;
     }
 
-    private int getResult(int id) {
+    private static int getResult(int id, List<Literal> literals,
+                                 ConjunctiveNormalForm cnf) {
+        if (cnf.getSatisfiable(true) == Literal.TRUE) {
+            return Literal.TRUE;
+        }
         if (id >= literals.size()) {
             return Literal.FALSE;
         }
         Literal literal = literals.get(id);
         literal.setValue(Literal.TRUE);
-        int result = cnf.getSatisfiable();
-        if (cnf.getSatisfiable() == Literal.UNINITIATED) {
-            result = getResult(id + 1);
+        int result = cnf.getSatisfiable(true);
+        if (cnf.getSatisfiable(true) == Literal.UNINITIATED) {
+            result = getResult(id + 1, literals, cnf);
         }
         if (result == Literal.FALSE) {
             literal.setValue(Literal.FALSE);
-            result = getResult(id + 1);
-        }
-        if (result == Literal.TRUE && solution.isEmpty()) {
-            for (Literal l : literals) {
-                solution.add(new Literal(l));
-            }
+            result = getResult(id + 1, literals, cnf);
         }
         literal.setValue(Literal.UNINITIATED);
         return result;
-    }
-
-    public List<Literal> getSolution() {
-        return solution;
-    }
-
-    @Override
-    public String toString() {
-        return cnf.toString();
     }
 }

@@ -1,48 +1,29 @@
 package solvers;
 
 import entities.ConjunctiveNormalForm;
-import entities.ConjunctiveNormalFormWithValue;
 import entities.core.Literal;
 
 import java.util.List;
 import java.util.Random;
 
-public class MonteCarloMethodSolver implements ConjunctiveNormalFormSolver {
-
-
-    private final ConjunctiveNormalFormWithValue cnf;
-    private final List<Literal> literals;
-    private final Random random = new Random();
-
-    public MonteCarloMethodSolver(ConjunctiveNormalForm cnf) {
-        this.cnf = new ConjunctiveNormalFormWithValue(cnf);
-        literals = this.cnf.getLiterals().stream().toList();
-    }
-
-    @Override
-    public boolean solve() {
-        int s = 0, mS = (int) (Math.pow(2, literals.size()) * 0.95);
+public class MonteCarloMethodSolver {
+    private static final Random random = new Random();
+    public static boolean solve(ConjunctiveNormalForm cnf) {
+        int s = 0, mS = (int) (Math.pow(2, cnf.getLiterals().size()) * 0.995);
         for (; s < mS; s++) {
-            if (nextValue() == Literal.TRUE) {
+            if (nextValue(cnf) == Literal.TRUE) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        for (Literal literal : literals) {
-            result.append(literal.name).append(" : ").append(literal.value == Literal.TRUE).append("; ");
+    private static int nextValue(ConjunctiveNormalForm cnf) {
+        for (Literal l : cnf.getLiterals()) {
+            if (random.nextBoolean())
+                l.setValue(Literal.TRUE);
+            else l.setValue(Literal.FALSE);
         }
-        return result.toString();
-    }
-
-    public int nextValue() {
-        for (Literal l : literals) {
-            l.value = random.nextBoolean() ? Literal.TRUE : Literal.FALSE;
-        }
-        return cnf.getSatisfiable();
+        return cnf.getSatisfiable(true);
     }
 }
